@@ -15,6 +15,7 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "lms_course_category",
   "video_link",
   "image",
   "column_break_3",
@@ -237,6 +238,13 @@
    "fieldname": "certification_tab",
    "fieldtype": "Tab Break",
    "label": "Certification"
+  },
+  {
+   "fieldname": "lms_course_category",
+   "fieldtype": "Link",
+   "label": "Course Category",
+   "options": "LMS Course Category",
+   "reqd": 1
   }
  ],
  "is_published_field": "published",
@@ -263,7 +271,7 @@
   }
  ],
  "make_attachments_public": 1,
- "modified": "2024-07-12 13:54:40.474097",
+ "modified": "2024-07-17 16:08:33.461726",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Course",

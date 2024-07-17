@@ -1217,6 +1217,7 @@ def get_course_details(course):
 		[
 			"name",
 			"title",
+			"lms_course_category",
 			"tags",
 			"description",
 			"image",

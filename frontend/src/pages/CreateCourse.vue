@@ -3,8 +3,7 @@
 		<div class="grid md:grid-cols-[70%,30%] h-full">
 			<div>
 				<header
-					class="sticky top-0 z-10 flex flex-col md:flex-row md:items-center justify-between border-b bg-white px-3 py-2.5 sm:px-5"
-				>
+					class="sticky top-0 z-10 flex flex-col md:flex-row md:items-center justify-between border-b bg-white px-3 py-2.5 sm:px-5">
 					<Breadcrumbs class="h-7" :items="breadcrumbs" />
 					<div class="flex items-center mt-3 md:mt-0">
 						<Button variant="solid" @click="submitCourse()" class="ml-2">
@@ -19,37 +18,29 @@
 						<div class="text-lg font-semibold mb-4">
 							{{ __('Details') }}
 						</div>
-						<FormControl
-							v-model="course.title"
-							:label="__('Title')"
-							class="mb-4"
-						/>
-						<FormControl
-							v-model="course.short_introduction"
-							:label="__('Short Introduction')"
-							class="mb-4"
-						/>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div class="mb-4">
+								<FormControl v-model="course.title" :label="__('Title')" />
+							</div>
+							<div class="mt-5">
+								<Autocomplete :options="courseCategories" v-model="selectedCategory"
+									placeholder="Select Course Category" />
+							</div>
+						</div>
+
+						<FormControl v-model="course.short_introduction" :label="__('Short Introduction')"
+							class="mb-4" />
 						<div class="mb-4">
 							<div class="mb-1.5 text-sm text-gray-700">
 								{{ __('Course Description') }}
 							</div>
-							<TextEditor
-								:content="course.description"
-								@change="(val) => (course.description = val)"
-								:editable="true"
-								:fixedMenu="true"
-								editorClass="prose-sm max-w-none border-b border-x bg-gray-100 rounded-b-md py-1 px-2 min-h-[7rem]"
-							/>
+							<TextEditor :content="course.description" @change="(val) => (course.description = val)"
+								:editable="true" :fixedMenu="true"
+								editorClass="prose-sm max-w-none border-b border-x bg-gray-100 rounded-b-md py-1 px-2 min-h-[7rem]" />
 						</div>
-						<FileUploader
-							v-if="!course.course_image"
-							:fileTypes="['image/*']"
-							:validateFile="validateFile"
-							@success="(file) => saveImage(file)"
-						>
-							<template
-								v-slot="{ file, progress, uploading, openFileSelector }"
-							>
+						<FileUploader v-if="!course.course_image" :fileTypes="['image/*']" :validateFile="validateFile"
+							@success="(file) => saveImage(file)">
+							<template v-slot="{ file, progress, uploading, openFileSelector }">
 								<div class="mb-4">
 									<Button @click="openFileSelector" :loading="uploading">
 										{{
@@ -75,90 +66,45 @@
 										{{ getFileSize(course.course_image.file_size) }}
 									</span>
 								</div>
-								<X
-									@click="removeImage()"
-									class="bg-gray-200 rounded-md cursor-pointer stroke-1.5 w-5 h-5 p-1 ml-4"
-								/>
+								<X @click="removeImage()"
+									class="bg-gray-200 rounded-md cursor-pointer stroke-1.5 w-5 h-5 p-1 ml-4" />
 							</div>
 						</div>
-						<FormControl
-							v-model="course.video_link"
-							:label="__('Preview Video')"
-							class="mb-4"
-						/>
+						<FormControl v-model="course.video_link" :label="__('Preview Video')" class="mb-4" />
 						<div class="mb-4">
 							<div class="mb-1.5 text-xs text-gray-600">
 								{{ __('Tags') }}
 							</div>
 							<div class="flex items-center">
-								<div
-									v-if="course.tags"
-									v-for="tag in course.tags?.split(', ')"
-									class="flex items-center bg-gray-100 p-2 rounded-md mr-2"
-								>
+								<div v-if="course.tags" v-for="tag in course.tags?.split(', ')"
+									class="flex items-center bg-gray-100 p-2 rounded-md mr-2">
 									{{ tag }}
-									<X
-										class="stroke-1.5 w-3 h-3 ml-2 cursor-pointer"
-										@click="removeTag(tag)"
-									/>
+									<X class="stroke-1.5 w-3 h-3 ml-2 cursor-pointer" @click="removeTag(tag)" />
 								</div>
-								<FormControl
-									v-model="newTag"
-									@keyup.enter="updateTags()"
-									id="tags"
-								/>
+								<FormControl v-model="newTag" @keyup.enter="updateTags()" id="tags" />
 							</div>
 						</div>
-						<MultiSelect
-							v-model="instructors"
-							doctype="User"
-							:label="__('Instructors')"
-						/>
+						<MultiSelect v-model="instructors" doctype="User" :label="__('Instructors')" />
 					</div>
 					<div class="container border-t">
 						<div class="text-lg font-semibold mt-5 mb-4">
 							{{ __('Settings') }}
 						</div>
 						<div class="grid grid-cols-3 gap-10 mb-4">
-							<div
-								v-if="user.data?.is_moderator"
-								class="flex flex-col space-y-3"
-							>
-								<FormControl
-									type="checkbox"
-									v-model="course.published"
-									:label="__('Published')"
-								/>
-								<FormControl
-									v-model="course.published_on"
-									:label="__('Published On')"
-									type="date"
-									class="mb-5"
-								/>
+							<div v-if="user.data?.is_moderator" class="flex flex-col space-y-3">
+								<FormControl type="checkbox" v-model="course.published" :label="__('Published')" />
+								<FormControl v-model="course.published_on" :label="__('Published On')" type="date"
+									class="mb-5" />
 							</div>
 							<div class="flex flex-col space-y-3">
-								<FormControl
-									type="checkbox"
-									v-model="course.upcoming"
-									:label="__('Upcoming')"
-								/>
-								<FormControl
-									type="checkbox"
-									v-model="course.featured"
-									:label="__('Featured')"
-								/>
+								<FormControl type="checkbox" v-model="course.upcoming" :label="__('Upcoming')" />
+								<FormControl type="checkbox" v-model="course.featured" :label="__('Featured')" />
 							</div>
 							<div class="flex flex-col space-y-3">
-								<FormControl
-									type="checkbox"
-									v-model="course.disable_self_learning"
-									:label="__('Disable Self Enrollment')"
-								/>
-								<FormControl
-									type="checkbox"
-									v-model="course.enable_certification"
-									:label="__('Completion Certificate')"
-								/>
+								<FormControl type="checkbox" v-model="course.disable_self_learning"
+									:label="__('Disable Self Enrollment')" />
+								<FormControl type="checkbox" v-model="course.enable_certification"
+									:label="__('Completion Certificate')" />
 							</div>
 						</div>
 					</div>
@@ -167,37 +113,22 @@
 							{{ __('Pricing') }}
 						</div>
 						<div class="mb-4">
-							<FormControl
-								type="checkbox"
-								v-model="course.paid_course"
-								:label="__('Paid Course')"
-							/>
+							<FormControl type="checkbox" v-model="course.paid_course" :label="__('Paid Course')" />
 						</div>
-						<FormControl
-							v-model="course.course_price"
-							:label="__('Course Price')"
-							class="mb-4"
-						/>
-						<Link
-							doctype="Currency"
-							v-model="course.currency"
-							:filters="{ enabled: 1 }"
-							:label="__('Currency')"
-						/>
+						<FormControl v-model="course.course_price" :label="__('Course Price')" class="mb-4" />
+						<Link doctype="Currency" v-model="course.currency" :filters="{ enabled: 1 }"
+							:label="__('Currency')" />
 					</div>
 				</div>
 			</div>
 			<div class="border-l pt-5">
-				<CourseOutline
-					v-if="courseResource.data"
-					:courseName="courseResource.data.name"
-					:title="course.title"
-					:allowEdit="true"
-				/>
+				<CourseOutline v-if="courseResource.data" :courseName="courseResource.data.name" :title="course.title"
+					:allowEdit="true" />
 			</div>
 		</div>
 	</div>
 </template>
+
 <script setup>
 import {
 	Breadcrumbs,
@@ -206,6 +137,8 @@ import {
 	createResource,
 	FormControl,
 	FileUploader,
+	Autocomplete,
+	createListResource,
 } from 'frappe-ui'
 import {
 	inject,
@@ -215,6 +148,7 @@ import {
 	ref,
 	reactive,
 	watch,
+	watchEffect
 } from 'vue'
 import {
 	convertToTitleCase,
@@ -246,6 +180,7 @@ const course = reactive({
 	video_link: '',
 	course_image: null,
 	tags: '',
+	category: '',
 	published: false,
 	published_on: '',
 	featured: false,
@@ -255,6 +190,36 @@ const course = reactive({
 	paid_course: false,
 	course_price: '',
 	currency: '',
+})
+
+const selectedCategory = ref(null)
+const courseCategories = ref([])
+
+// Fetch course categories using createListResource
+const courseCategoriesResource = createListResource({
+	doctype: 'LMS Course Category',
+	fields: ['lms_category_name as label', 'lms_category_name as value'],
+	orderBy: 'creation desc',
+	start: 0,
+	pageLength: 100, // Assuming you don't have more than 100 categories
+	auto: true,
+	transform: (data) => {
+		console.log('Raw data:', data) // Log the raw data
+		const transformedData = data.map(category => ({
+			label: category.label,
+			value: category.value
+		}));
+		console.log('Transformed data:', transformedData) // Log transformed data
+		return transformedData;
+	}
+})
+
+// Watch for changes in the fetched data and update courseCategories
+watchEffect(() => {
+	if (courseCategoriesResource.data && courseCategoriesResource.data.length > 0) {
+		console.log('Fetched course categories:', courseCategoriesResource.data);
+		courseCategories.value = courseCategoriesResource.data;
+	}
 })
 
 onMounted(() => {
@@ -297,6 +262,7 @@ const courseCreationResource = createResource({
 				instructors: instructors.value.map((instructor) => ({
 					instructor: instructor,
 				})),
+				lms_course_category: selectedCategory.value?.value || '', // Ensure category is set
 				...values,
 			},
 		}
@@ -311,15 +277,17 @@ const courseEditResource = createResource({
 			doctype: 'LMS Course',
 			name: values.course,
 			fieldname: {
-				image: course.course_image?.file_url || '',
+				image: course.course_image?.file_url || '', // Ensure image is set
 				instructors: instructors.value.map((instructor) => ({
 					instructor: instructor,
 				})),
+				lms_course_category: selectedCategory.value?.value || '', // Ensure category is set
 				...course,
 			},
 		}
 	},
 })
+
 
 const courseResource = createResource({
 	url: 'frappe.client.get',
@@ -371,6 +339,12 @@ const imageResource = createResource({
 })
 
 const submitCourse = () => {
+	const mandatoryMessage = validateMandatoryFields()
+	if (mandatoryMessage) {
+		showToast('Error', mandatoryMessage, 'x')
+		return
+	}
+
 	if (courseResource.data) {
 		courseEditResource.submit(
 			{
@@ -408,9 +382,10 @@ const validateMandatoryFields = () => {
 		'description',
 		'video_link',
 		'course_image',
+		'category',
 	]
 	for (const field of mandatory_fields) {
-		if (!course[field]) {
+		if (!course[field] && (!selectedCategory.value && field === 'category')) {
 			let fieldLabel = convertToTitleCase(field.split('_').join(' '))
 			return `${fieldLabel} is mandatory`
 		}
@@ -419,6 +394,7 @@ const validateMandatoryFields = () => {
 		return 'Course price and currency are mandatory for paid courses'
 	}
 }
+
 
 watch(
 	() => props.courseName !== 'new',

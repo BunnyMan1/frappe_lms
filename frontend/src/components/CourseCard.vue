@@ -1,31 +1,13 @@
 <template>
-	<div
-		v-if="course.title"
-		class="flex flex-col h-full rounded-md shadow-md text-base overflow-auto"
-		style="min-height: 320px"
-	>
-		<div
-			class="course-image"
-			:class="{ 'default-image': !course.image }"
-			:style="{ backgroundImage: 'url(\'' + encodeURI(course.image) + '\')' }"
-		>
+	<div v-if="course.title" class="flex flex-col h-full rounded-md shadow-md text-base overflow-auto"
+		style="min-height: 320px">
+		<div class="course-image" :class="{ 'default-image': !course.image }"
+			:style="{ backgroundImage: 'url(\'' + encodeURI(course.image) + '\')' }">
 			<div class="flex relative top-4 left-4 w-fit flex-wrap">
-				<Badge
-					v-if="course.featured"
-					variant="subtle"
-					theme="green"
-					size="md"
-					class="mr-2"
-				>
+				<Badge v-if="course.featured" variant="subtle" theme="green" size="md" class="mr-2">
 					{{ __('Featured') }}
 				</Badge>
-				<Badge
-					variant="outline"
-					theme="gray"
-					size="md"
-					class="mr-2"
-					v-for="tag in course.tags"
-				>
+				<Badge variant="outline" theme="gray" size="md" class="mr-2" v-for="tag in course.tags">
 					{{ tag }}
 				</Badge>
 			</div>
@@ -63,14 +45,15 @@
 				</div>
 
 				<div v-if="course.status != 'Approved'">
-					<Badge
-						variant="solid"
-						:theme="course.status === 'Under Review' ? 'orange' : 'blue'"
-						size="sm"
-					>
+					<Badge variant="solid" :theme="course.status === 'Under Review' ? 'orange' : 'blue'" size="sm">
 						{{ course.status }}
 					</Badge>
 				</div>
+			</div>
+			<div class="flex justify-start">
+				<Badge :variant="'solid'" theme="gray" size="sm" class="p-3">
+					{{ course.lms_course_category }}
+				</Badge>
 			</div>
 
 			<div class="text-xl font-semibold leading-6">
@@ -81,10 +64,7 @@
 				{{ course.short_introduction }}
 			</div>
 
-			<ProgressBar
-				v-if="user && course.membership"
-				:progress="course.membership.progress"
-			/>
+			<ProgressBar v-if="user && course.membership" :progress="course.membership.progress" />
 
 			<div v-if="user && course.membership" class="text-sm mb-4">
 				{{ Math.ceil(course.membership.progress) }}% completed
@@ -92,14 +72,8 @@
 
 			<div class="flex items-center justify-between mt-auto">
 				<div class="flex avatar-group overlap">
-					<div
-						class="h-6 mr-1"
-						:class="{ 'avatar-group overlap': course.instructors.length > 1 }"
-					>
-						<UserAvatar
-							v-for="instructor in course.instructors"
-							:user="instructor"
-						/>
+					<div class="h-6 mr-1" :class="{ 'avatar-group overlap': course.instructors.length > 1 }">
+						<UserAvatar v-for="instructor in course.instructors" :user="instructor" />
 					</div>
 					<CourseInstructors :instructors="course.instructors" />
 				</div>
@@ -166,6 +140,7 @@ const props = defineProps({
 .avatar-group .avatar {
 	transition: margin 0.1s ease-in-out;
 }
+
 .image-placeholder {
 	display: flex;
 	align-items: center;
@@ -174,7 +149,8 @@ const props = defineProps({
 	color: theme('colors.gray.700');
 	font-weight: 600;
 }
-.avatar-group.overlap .avatar + .avatar {
+
+.avatar-group.overlap .avatar+.avatar {
 	margin-left: calc(-8px);
 }
 
