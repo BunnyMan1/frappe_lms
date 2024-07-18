@@ -1,29 +1,66 @@
 <template>
 	<div v-if="courses.data">
-		<header class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-3 py-2.5 sm:px-5">
-			<Breadcrumbs class="h-7" :items="[{ label: __('All Courses'), route: { name: 'Courses' } }]" />
-			<div class="flex space-x-2">
-				<FormControl type="text" placeholder="Search Course" v-model="searchQuery" @input="courses.reload()">
-					<template #prefix>
-						<Search class="w-4 stroke-1.5 text-gray-600" name="search" />
-					</template>
-				</FormControl>
-				<Autocomplete
-					v-model="selectedCategory"
-					:options="courseCategories"
-					placeholder="Select Course Category"
-					item-label="label"
-					item-value="value"
-					@input="filterCoursesByCategory"
-				/>
-				<router-link :to="{ name: 'CreateCourse', params: { courseName: 'new' } }">
-					<Button v-if="user.data?.is_moderator" variant="solid">
+		<header class="sticky top-0 z-10 border-b bg-white px-3 py-2.5 sm:px-5">
+			<!-- For desktop and laptop views -->
+			<div class="hidden md:flex md:flex-row md:items-center md:justify-between">
+				<div class="flex items-center space-x-4">
+					<Breadcrumbs class="h-7" :items="[{ label: __('All Courses'), route: { name: 'Courses' } }]" />
+					<Autocomplete :options="courseCategories" v-model="selectedCategory"
+						placeholder="Select Course Category" class="w-full" />
+				</div>
+				<div class="flex space-x-2">
+					<FormControl type="text" placeholder="Search Course" v-model="searchQuery"
+						@input="courses.reload()">
 						<template #prefix>
-							<Plus class="h-4 w-4" />
+							<Search class="w-4 stroke-1.5 text-gray-600" name="search" />
 						</template>
-						{{ __('New Course') }}
-					</Button>
-				</router-link>
+					</FormControl>
+					<router-link :to="{
+						name: 'CreateCourse',
+						params: {
+							courseName: 'new',
+						},
+					}">
+						<Button v-if="user.data?.is_moderator" variant="solid">
+							<template #prefix>
+								<Plus class="h-4 w-4" />
+							</template>
+							{{ __('New Course') }}
+						</Button>
+					</router-link>
+				</div>
+			</div>
+
+			<!-- For mobile views -->
+			<div class="flex flex-col space-y-2 md:hidden">
+				<div class="flex items-center space-x-4">
+					<Breadcrumbs class="h-7" :items="[{ label: __('All Courses'), route: { name: 'Courses' } }]" />
+				</div>
+				<div class="flex space-x-2">
+					<FormControl type="text" placeholder="Search Course" v-model="searchQuery"
+						@input="courses.reload()">
+						<template #prefix>
+							<Search class="w-4 stroke-1.5 text-gray-600" name="search" />
+						</template>
+					</FormControl>
+					<router-link :to="{
+						name: 'CreateCourse',
+						params: {
+							courseName: 'new',
+						},
+					}">
+						<Button v-if="user.data?.is_moderator" variant="solid">
+							<template #prefix>
+								<Plus class="h-4 w-4" />
+							</template>
+							{{ __('New Course') }}
+						</Button>
+					</router-link>
+				</div>
+				<div>
+					<Autocomplete :options="courseCategories" v-model="selectedCategory" placeholder="Course Category"
+						class="w-full" />
+				</div>
 			</div>
 		</header>
 		<div>
@@ -40,20 +77,18 @@
 					</div>
 				</template>
 				<template #default="{ tab }">
-					<div v-if="tab.courses && tab.courses.value.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 my-5 mx-5">
-						<router-link
-							v-for="course in tab.courses.value"
-							:key="course.name"
-							:to="course.membership && course.current_lesson
-								? {
-									name: 'Lesson',
-									params: {
-										courseName: course.name,
-										chapterNumber: course.current_lesson.split('-')[0],
-										lessonNumber: course.current_lesson.split('-')[1],
-									},
-								}
-								: course.membership
+					<div v-if="tab.courses && tab.courses.value.length"
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 my-5 mx-5">
+						<router-link v-for="course in tab.courses.value" :key="course.name" :to="course.membership && course.current_lesson
+							? {
+								name: 'Lesson',
+								params: {
+									courseName: course.name,
+									chapterNumber: course.current_lesson.split('-')[0],
+									lessonNumber: course.current_lesson.split('-')[1],
+								},
+							}
+							: course.membership
 								? {
 									name: 'Lesson',
 									params: {
@@ -144,7 +179,7 @@ watchEffect(() => {
 
 // Handle category selection change
 const filterCoursesByCategory = () => {
-	console.log('Selected category value:', selectedCategory.value?.value)
+	// console.log('Selected category value:', selectedCategory.value?.value)
 	// Update the category parameter and reload courses
 	courseParams.value.category = selectedCategory.value?.value
 	courses.reload()
