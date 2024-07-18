@@ -32,7 +32,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-16 14:41:06.145231",
+ "modified": "2024-07-17 17:03:16.416900",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Course Category",
@@ -54,5 +54,6 @@
  ],
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

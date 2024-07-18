@@ -307,6 +307,10 @@ const courseResource = createResource({
 				})
 			} else if (Object.hasOwn(course, key)) course[key] = data[key]
 		})
+		
+		// Set the selectedCategory based on fetched data
+		selectedCategory.value = courseCategories.value.find(category => category.value === data.lms_course_category) || null;
+		
 		let checkboxes = [
 			'published',
 			'upcoming',
@@ -324,6 +328,7 @@ const courseResource = createResource({
 		check_permission()
 	},
 })
+
 
 const imageResource = createResource({
 	url: 'lms.lms.api.get_file_info',

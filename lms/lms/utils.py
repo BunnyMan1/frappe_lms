@@ -1196,17 +1196,24 @@ def change_currency(amount, currency, country=None):
 	amount, currency = check_multicurrency(amount, currency, country)
 	return fmt_money(amount, 0, currency)
 
+@frappe.whitelist(allow_guest=True)
+def get_course_categories():
+    """Returns the list of course categories."""
+    categories = frappe.get_all("LMS Course Category", fields=["name"], distinct=True)
+    return [category.name for category in categories]
 
 @frappe.whitelist(allow_guest=True)
-def get_courses():
-	"""Returns the list of courses."""
-	courses = []
-	course_list = frappe.get_all("LMS Course", pluck="name")
-	for course in course_list:
-		courses.append(get_course_details(course))
-
-	courses = get_categorized_courses(courses)
-	return courses
+def get_course_by_category(category):
+    """Returns the courses by the respective category"""
+    if not category:
+        frappe.throw(_("Category is required"), frappe.ValidationError)
+    
+    courses = frappe.db.get_all(
+        "LMS Course", 
+        filters={"lms_course_category": category}, 
+        fields=["name", "title", "short_introduction", "description", "lms_course_category"]
+    )
+    return courses
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1280,45 +1287,113 @@ def get_course_details(course):
 
 	return course_details
 
+@frappe.whitelist(allow_guest=True)
+def get_courses(category=None):
+    """Returns the list of courses."""
+    if category:
+        return get_courses_by_custom_category(category)
+    
+    courses = frappe.get_all("LMS Course", pluck="name")
+    course_details = [get_course_details(course) for course in courses]
 
+    return get_categorized_courses(course_details)
+
+
+@frappe.whitelist(allow_guest=True)
 def get_categorized_courses(courses):
-	live, upcoming, new, enrolled, created, under_review = [], [], [], [], [], []
+    live, upcoming, new, enrolled, created, under_review = [], [], [], [], [], []
 
-	for course in courses:
-		if course.status == "Under Review":
-			under_review.append(course)
-		elif course.published and course.upcoming:
-			upcoming.append(course)
-		elif course.published:
-			live.append(course)
+    for course in courses:
+        if course.status == "Under Review":
+            under_review.append(course)
+        elif course.published and course.upcoming:
+            upcoming.append(course)
+        elif course.published:
+            live.append(course)
 
-		if (
-			course.published
-			and not course.upcoming
-			and course.published_on > add_months(getdate(), -3)
-		):
-			new.append(course)
+        if (
+            course.published
+            and not course.upcoming
+            and course.published_on > add_months(getdate(), -3)
+        ):
+            new.append(course)
 
-		if course.membership and course.published:
-			enrolled.append(course)
-		elif course.is_instructor:
-			created.append(course)
+        if course.membership and course.published:
+            enrolled.append(course)
+        elif course.is_instructor:
+            created.append(course)
 
-		categories = [live, enrolled, created]
-		for category in categories:
-			category.sort(key=lambda x: x.enrollment_count, reverse=True)
+    categories = [live, enrolled, created]
+    for category in categories:
+        category.sort(key=lambda x: x.enrollment_count, reverse=True)
 
-		live.sort(key=lambda x: x.featured, reverse=True)
+    live.sort(key=lambda x: x.featured, reverse=True)
 
-	return {
-		"live": live,
-		"new": new,
-		"upcoming": upcoming,
-		"enrolled": enrolled,
-		"created": created,
-		"under_review": under_review,
-	}
+    return {
+		"all": courses,
+        "live": live,
+        "new": new,
+        "upcoming": upcoming,
+        "enrolled": enrolled,
+        "created": created,
+        "under_review": under_review,
+    }
 
+
+@frappe.whitelist(allow_guest=True)
+def get_courses_by_custom_category(category):
+    """Returns categorized courses by the respective custom category"""
+    if not category:
+        frappe.throw(_("Category is required"), frappe.ValidationError)
+    
+    # Fetch courses by custom category
+    courses = frappe.db.get_all(
+        "LMS Course", 
+        filters={"lms_course_category": category}, 
+        fields=["name"]
+    )
+    
+    # Initialize categories
+    live, upcoming, new, enrolled, created, under_review = [], [], [], [], [], []
+
+    for course in courses:
+        course_details = get_course_details(course.name)
+        
+        if course_details['status'] == "Under Review":
+            under_review.append(course_details)
+        elif course_details['published'] and course_details['upcoming']:
+            upcoming.append(course_details)
+        elif course_details['published']:
+            live.append(course_details)
+
+        if (
+            course_details['published']
+            and not course_details['upcoming']
+            and course_details['published_on'] > add_months(getdate(), -3)
+        ):
+            new.append(course_details)
+
+        if course_details['membership'] and course_details['published']:
+            enrolled.append(course_details)
+        elif course_details['is_instructor']:
+            created.append(course_details)
+
+    # Sort categories
+    categories = [live, enrolled, created]
+    for category in categories:
+        category.sort(key=lambda x: x['enrollment_count'], reverse=True)
+
+    live.sort(key=lambda x: x['featured'], reverse=True)
+
+    return {
+        "all": [get_course_details(course.name) for course in courses],
+        "live": live,
+        "new": new,
+        "upcoming": upcoming,
+        "enrolled": enrolled,
+        "created": created,
+        "under_review": under_review,
+    }
 
 @frappe.whitelist(allow_guest=True)
 def get_course_outline(course, progress=False):
