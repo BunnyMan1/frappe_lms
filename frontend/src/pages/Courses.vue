@@ -6,7 +6,7 @@
 		  <div class="flex items-center space-x-4">
 			<Breadcrumbs class="h-7" :items="[{ label: __('All Courses'), route: { name: 'Courses' } }]" />
 			<Autocomplete :options="courseCategories" v-model="selectedCategory"
-			  placeholder="Select Course Category" class="w-full" />
+			  placeholder="Course Category" class="w-full" />
 		  </div>
 		  <div class="flex space-x-2">
 			<FormControl type="text" placeholder="Search Course" v-model="searchQuery"

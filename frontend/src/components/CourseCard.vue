@@ -155,13 +155,29 @@ const props = defineProps({
 }
 
 .short-introduction {
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	text-overflow: ellipsis;
-	width: 100%;
-	overflow: hidden;
-	margin: 0.25rem 0 1.25rem;
-	line-height: 1.5;
+  display: -webkit-box;           /* Fallback for older browsers */
+  display: -moz-box;              /* Fallback for older versions of Firefox */
+  display: -ms-flexbox;           /* Fallback for Internet Explorer */
+  display: -webkit-flex;          /* Fallback for Chrome, Safari */
+  display: flex;                  /* Standard syntax */
+
+  -webkit-box-orient: vertical;   /* Required for -webkit-line-clamp */
+  -moz-box-orient: vertical;      /* Required for Firefox with -moz-box */
+  -ms-flex-direction: column;     /* Required for IE with -ms-flexbox */
+  -webkit-flex-direction: column; /* Required for Chrome, Safari */
+  flex-direction: column;         /* Standard syntax */
+
+  overflow: hidden;               /* Required to hide overflowed content */
+  text-overflow: ellipsis;        /* For ellipsis at the end of the lines */
+
+  -webkit-line-clamp: 2;          /* WebKit specific line clamping */
+  -moz-line-clamp: 2;             /* Proposed for Firefox, not yet supported */
+  -ms-line-clamp: 2;              /* Proposed for Internet Explorer, not yet supported */
+  line-clamp: 2;                  /* Standard syntax, not widely supported */
+
+  width: 100%;
+  margin: 0.25rem 0 1.25rem;
+  line-height: 1.5;
 }
+
 </style>
