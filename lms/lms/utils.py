@@ -1289,22 +1289,21 @@ def get_course_details(course):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_courses(category=None):
+def get_courses():
     """Returns the list of courses."""
+    data = frappe.local.form_dict
+    category = data.get('category')
+
+    filters = {}
     if category:
-        courses = frappe.db.get_all(
-            "LMS Course",
-            filters={"lms_course_category": category},
-            fields=["name"]
-        )
-        courses = [course.name for course in courses]
-    else:
-        courses = frappe.get_all("LMS Course", pluck="name")
+        filters["lms_course_category"] = category
+
+    courses = frappe.db.get_all("LMS Course", filters=filters, fields=["name"])
+    courses = [course.name for course in courses]
 
     course_details = [get_course_details(course) for course in courses]
 
     return get_categorized_courses(course_details)
-
 
 @frappe.whitelist(allow_guest=True)
 def get_categorized_courses(courses):
