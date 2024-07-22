@@ -166,7 +166,7 @@
    "fieldname": "category",
    "fieldtype": "Link",
    "label": "Category",
-   "options": "LMS Category"
+   "options": "LMS Course Category"
   },
   {
    "description": "These customisations will work on the main batch page.",
@@ -325,7 +325,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-24 16:24:45.536453",
+ "modified": "2024-07-22 14:13:33.086915",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Batch",
